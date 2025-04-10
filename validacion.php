@@ -145,5 +145,53 @@ if(isset($_POST['val'])) {
         <?php
       }
       break;
-  }
-}
+
+      case 5 : //eliminacion de productos en el carrito
+        $sql = "DELETE FROM carrito WHERE id_usuario='$_SESSION[id_usuario]' AND id_producto='$_POST[idp]'";
+        mysqli_query($link,$sql);
+        if (mysqli_error($link))
+        {?>
+          <script> alert("Error en la eliminación del producto. "); </script>
+          <meta http-equiv="refresh" content="2;URL=./carrito.php" />
+          <?php
+        }
+        else
+        {
+          $sql1 = "UPDATE producto SET cantidad = cantidad +'$_POST[cant]' WHERE id_producto='$_POST[idp]' ";
+          mysqli_query($link,$sql1);?>
+          <script> alert("El producto ha sido eliminado exitosamente "); </script>
+          <meta http-equiv="refresh" content="2;URL=./carrito.php" />
+          <?php
+        }
+        break;
+
+      case '6' : // Compra de productos
+        date_default_timezone_set('America/Caracas');
+        $fecha = date('Y-m-d h:i:s');
+        $sql = "INSERT INTO compra (id_usuario, fecha, total) VALUES($_SESSION[id_usuario],'$fecha','$_POST[total1]')";
+        mysqli_query($link,$sql);
+        if (mysqli_error($link))
+        {
+          ?>
+          <script> alert("Error en la compra. Intente nuevamente."); </script>
+          <meta http-equiv="refresh" content="2;URL=./precompra.php" />
+          <?php
+        }
+        else
+        {
+          $sql = "SELECT max(id_compra) FROM compra WHERE id_usuario=$_SESSION[id_usuario]";
+          $query = mysqli_query($link,$sql);
+          $idc = mysqli_fetch_array($query);
+          // se elimina el producto del carrito
+          $sql = "DELETE FROM carrito WHERE id_usuario= '$_SESSION[id_usuario]' ";
+          mysqli_query($link,$sql);
+          ?>
+          <script> alert("Su compra se ha efectuado. Gracias "); </script>
+          <meta http-equiv="refresh" content="2;URL=./index.php" />
+          <?php
+        }
+        break;
+        }
+      }
+      
+      
